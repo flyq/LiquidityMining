@@ -3,20 +3,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "openzeppelin-contracts/contracts/utils/math/SafeMath.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
-contract Unipool is ERC20, ERC20Detailed("Unipool", "SNX-UNP", 18) {
+contract Unipool is ERC20 {
 
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     uint256 constant public REWARD_RATE = uint256(72000e18) / 7 days;
-    IERC20 public snx = IERC20(0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F);
-    IERC20 public uni = IERC20(0xe9Cf7887b93150D4F2Da7dFc6D502B216438F244);
+    IERC20 public snx;
+    IERC20 public uni;
 
     // 
     uint256 public lastUpdateTime;
@@ -32,9 +31,14 @@ contract Unipool is ERC20, ERC20Detailed("Unipool", "SNX-UNP", 18) {
         _;
     }
 
+    constructor(address _snx, address _uni) ERC20("Unipool", "SNX-UNP") {
+        snx = IERC20(_snx);
+        uni = IERC20(_uni);
+    }
+
     function rewardPerToken() public view returns(uint256) {
         return rewardPerTokenStored.add(
-            totalSupply() == 0 ? 0 : (now.sub(lastUpdateTime)).mul(REWARD_RATE).mul(1e18).div(totalSupply())
+            totalSupply() == 0 ? 0 : (block.timestamp.sub(lastUpdateTime)).mul(REWARD_RATE).mul(1e18).div(totalSupply())
         );
     }
 
@@ -65,7 +69,7 @@ contract Unipool is ERC20, ERC20Detailed("Unipool", "SNX-UNP", 18) {
 
         rewardPerTokenStored = rewardPerToken();
         userRewardPerTokenPaid[msg.sender] = rewardPerTokenStored;
-        lastUpdateTime = now;
+        lastUpdateTime = block.timestamp;
 
         if (reward > 0) {
             snx.safeTransfer(msg.sender, reward);
