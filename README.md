@@ -74,7 +74,7 @@ But there is a problem, `rewardPerToken()` and `rewardPerTokenStored` are counte
 ```
 
 Then, when calculating the payoff, we need to subtract this part:
-```
+```solidity
     function earned(address account) public view returns(uint256) {
         return balanceOf(account).mul(
             rewardPerToken().sub(userRewardPerTokenPaid[account])
