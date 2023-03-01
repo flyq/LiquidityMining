@@ -42,7 +42,7 @@ $$
 
 * $Reward_u$ is somebody(user)'s total reward
 * $Balance_{ui}$ is somebody(user)'s `SNX_UNP` balance in $t_i$
-* $TotalSupply_i$ is `SNX_UNP`'s TotalSupply
+* $TotalSupply_i$ is `SNX_UNP`'s `TotalSupply` in $t_i$
 
 When the user changes his balance (stake, withdraw, withdrawAll), the contract settles his reward(executing getReward). So the $Balance_{ui}$ will not be changed between these two actions(from $t_m$ to $t_n$) by the user:
 
