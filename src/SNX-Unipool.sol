@@ -17,7 +17,6 @@ contract Unipool is ERC20 {
     IERC20 public snx;
     IERC20 public uni;
 
-    // 
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
     mapping(address => uint256) public userRewardPerTokenPaid;

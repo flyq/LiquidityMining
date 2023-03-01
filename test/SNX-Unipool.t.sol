@@ -24,22 +24,57 @@ contract UnipoolTest is Test {
     // VM Cheatcodes can be found in ./lib/forge-std/src/Vm.sol
     // Or at https://github.com/foundry-rs/forge-std
     function testStake() external {
-        emit log_uint(unipool.balanceOf(address(this)));
-        emit log_uint(rewardToken.balanceOf(address(this)));
-        emit log_uint(stakedToken.balanceOf(address(this)));
+        assertEq(rewardToken.balanceOf(address(unipool)), 1_000_000e18);
+        assertEq(stakedToken.balanceOf(address(this)), 1_000_000e18);
+        assertEq(unipool.totalSupply(), 0);
 
-        stakedToken.approve(address(unipool), stakedToken.balanceOf(address(this)));
+        address alice = vm.addr(1);
+        address bob = vm.addr(2);
+        address cb = vm.addr(3);
 
-        unipool.stake(1000*10**stakedToken.decimals());
+        stakedToken.transfer(alice, 1000e18);
+        stakedToken.transfer(bob, 1000e18);
 
-        emit log_uint(stakedToken.balanceOf(address(this)));
+        emit log_string("alice staking......");
+
+        vm.startPrank(alice);
+        stakedToken.approve(address(unipool), 1000e18);
+        unipool.stake(1000e18);
+        vm.stopPrank();
 
         skip(7 days);
-        emit log_uint(unipool.earned(address(this)));
-        unipool.withdraw(1000*10**stakedToken.decimals());
 
-        emit log_uint(unipool.balanceOf(address(this)));
-        emit log_uint(rewardToken.balanceOf(address(this)));
-        emit log_uint(stakedToken.balanceOf(address(this)));
+        emit log_string("7 days pass......");
+
+        emit log_string("bob staking......");
+
+        vm.startPrank(bob);
+        stakedToken.approve(address(unipool), 1000e18);
+        unipool.stake(1000e18);
+        vm.stopPrank();
+
+
+        skip(7 days);
+
+        emit log_string("7 days pass......");
+
+
+        emit log_string("alice and bob withdrawAll......");
+
+        vm.startPrank(alice);
+        unipool.withdrawAll();
+        vm.stopPrank();
+
+        vm.startPrank(bob);
+        unipool.withdrawAll();
+        vm.stopPrank();
+
+        emit log_named_uint("alice's unipool token", unipool.balanceOf(alice));
+        emit log_named_uint("alice's rewardToken", rewardToken.balanceOf(alice));
+        emit log_named_uint("alice's stakedToken", stakedToken.balanceOf(alice));
+
+        emit log_named_uint("bob's unipool token", unipool.balanceOf(bob));
+        emit log_named_uint("bob's rewardToken", rewardToken.balanceOf(bob));
+        emit log_named_uint("bob's stakedToken", stakedToken.balanceOf(bob));
     }
 }
