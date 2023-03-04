@@ -30,7 +30,6 @@ contract UnipoolTest is Test {
 
         address alice = vm.addr(1);
         address bob = vm.addr(2);
-        address cb = vm.addr(3);
 
         stakedToken.transfer(alice, 1000e18);
         stakedToken.transfer(bob, 1000e18);
